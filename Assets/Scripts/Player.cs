@@ -4,19 +4,34 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField]
-    private float _speed = 10f;
-    // Start is called before the first frame update
+    [SerializeField] private int _lives = 1;
+    [SerializeField] private float _speed = 10f;
+    [SerializeField] private float _primaryFireRate = 0.15f;
+    private float _primaryNextFire = 0.0f;
+    [SerializeField] private GameObject _primaryLaserPrefab;
+    private Vector3 _primaryLaserOffset = new Vector3(0, 0.8f, 0);
+    private SpawnManager _spawnManager;
+
     void Start()
     {
-        //Take current position = new position (0, 0, 0)
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+
+        if (_spawnManager == null)
+        {
+            Debug.LogError("Spawn Manager is NULL");
+        }
+
         transform.position = new Vector3(0, 0, 0);
     }
 
-    // Update is called once per frame
     void Update()
     {
         CalculateMovement();
+
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time > _primaryNextFire)
+        {
+            FirePrimaryLaser();
+        }
     }
 
     void CalculateMovement()
@@ -35,6 +50,25 @@ public class Player : MonoBehaviour
         else if (transform.position.x <= -11.3f)
         {
             transform.position = new Vector3(11.3f, transform.position.y, 0);
+        }
+    }
+
+    void FirePrimaryLaser()
+    {
+
+        _primaryNextFire = Time.time + _primaryFireRate;
+        Instantiate(_primaryLaserPrefab, transform.position + _primaryLaserOffset, Quaternion.identity);
+
+    }
+
+    public void Damage()
+    {
+        _lives--;
+
+        if (_lives < 1)
+        {
+            _spawnManager.onPlayerDeath();
+            Destroy(gameObject);
         }
     }
 }
