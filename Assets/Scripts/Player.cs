@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private int _lives = 1;
-    [SerializeField] private float _speed = 10f;
-    [SerializeField] private float _primaryFireRate = 0.15f;
+    [SerializeField]
+    private int _lives = 3;
+    [SerializeField]
+    private float _speed = 10f;
+    [SerializeField]
+    private float _primaryFireRate = 0.15f;
     private float _primaryNextFire = 0.0f;
-    [SerializeField] private GameObject _primaryLaserPrefab;
-    private Vector3 _primaryLaserOffset = new Vector3(0, 0.8f, 0);
+    [SerializeField]
+    private GameObject _primaryLaserPrefab;
+    private Vector3 _primaryLaserOffset = new Vector3(0, 1.01f, 0);
+    [SerializeField]
+    private GameObject _tripleShotPrefab;
     private SpawnManager _spawnManager;
+    private bool _isTripleShotActive = true;
 
     void Start()
     {
@@ -57,7 +64,15 @@ public class Player : MonoBehaviour
     {
 
         _primaryNextFire = Time.time + _primaryFireRate;
-        Instantiate(_primaryLaserPrefab, transform.position + _primaryLaserOffset, Quaternion.identity);
+        if (_isTripleShotActive)
+        {
+            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+        }
+        else
+        {
+            Instantiate(_primaryLaserPrefab, transform.position + _primaryLaserOffset, Quaternion.identity);
+        }
+
 
     }
 
