@@ -6,32 +6,45 @@ public class SpawnManager : MonoBehaviour
 {
     [SerializeField] private GameObject _enemyPrefab;
     [SerializeField] private GameObject _enemyContainer;
-    [SerializeField] private float delayTime = 5.0f;
-    private bool _stopSpawning = false;
+    [SerializeField] private float _enemyDelayTime = 5.0f;
+    [SerializeField] private GameObject[] powerups;
+    private bool _stopSpawningEnemies = false;
+    private bool _stopSpawningPowerups = false;
     void Start()
     {
-        StartCoroutine(SpawnRoutine());
+        StartCoroutine(SpawnEnemyRoutine());
+        StartCoroutine(SpawnPowerupRoutine());
     }
 
-    // Update is called once per frame
     void Update()
     {
 
     }
 
-    private IEnumerator SpawnRoutine()
+    private IEnumerator SpawnEnemyRoutine()
     {
-        while (_stopSpawning == false)
+        while (_stopSpawningEnemies == false)
         {
             Vector3 posToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
             GameObject newEnemy = Instantiate(_enemyPrefab, posToSpawn, Quaternion.identity);
             newEnemy.transform.parent = _enemyContainer.transform;
-            yield return new WaitForSeconds(delayTime);
+            yield return new WaitForSeconds(_enemyDelayTime);
+        }
+    }
+    private IEnumerator SpawnPowerupRoutine()
+    {
+        while (_stopSpawningPowerups == false)
+        {
+            yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
+            Vector3 posToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
+            int randomPowerUp = Random.Range(0, 3);
+            Instantiate(powerups[randomPowerUp], posToSpawn, Quaternion.identity);
         }
     }
 
     public void onPlayerDeath()
     {
-        _stopSpawning = true;
+        _stopSpawningEnemies = true;
+        _stopSpawningPowerups = true;
     }
 }
