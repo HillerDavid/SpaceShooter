@@ -42,7 +42,7 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    public void onPlayerDeath()
+    public void OnPlayerDeath()
     {
         _stopSpawningEnemies = true;
         _stopSpawningPowerups = true;

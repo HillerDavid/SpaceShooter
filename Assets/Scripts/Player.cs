@@ -28,10 +28,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _score;
 
+    private UIManager _uiManager;
+
     void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
-
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         if (_spawnManager == null)
         {
             Debug.LogError("Spawn Manager is NULL");
@@ -101,10 +103,11 @@ public class Player : MonoBehaviour
         }
 
         _lives--;
+        _uiManager.UpdateLives(_lives);
 
         if (_lives < 1)
         {
-            _spawnManager.onPlayerDeath();
+            _spawnManager.OnPlayerDeath();
             Destroy(gameObject);
         }
     }
@@ -139,9 +142,9 @@ public class Player : MonoBehaviour
         _shieldVisualizer.SetActive(true);
     }
 
-    public void AddToScore()
+    public void AddToScore(int points)
     {
-        _score += 10;
-        UIManager uiManager
+        _score += points;
+        _uiManager.UpdateScore(_score);
     }
 }
