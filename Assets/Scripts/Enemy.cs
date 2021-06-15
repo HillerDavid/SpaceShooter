@@ -9,17 +9,27 @@ public class Enemy : MonoBehaviour
     private int _scoreValue = 10;
 
     private Player _player;
-    private Animator _anim;
+    private Animator _deathAnim;
+
+    private AudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _deathSoundClip;
     void Start()
     {
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+        {
+            Debug.LogError("Audio Source of Enemy is NULL.");
+        }
+
         _player = GameObject.Find("Player").GetComponent<Player>();
         if (_player == null)
         {
             Debug.LogError("The Player is NULL.");
         }
 
-        _anim = gameObject.GetComponent<Animator>();
-        if (_anim == null)
+        _deathAnim = gameObject.GetComponent<Animator>();
+        if (_deathAnim == null)
         {
             Debug.Log("The animator is NULL.");
         }
@@ -45,23 +55,25 @@ public class Enemy : MonoBehaviour
             {
                 player.Damage();
             }
+            gameObject.GetComponent<PolygonCollider2D>().enabled = false;
             _speed = 0;
-            _anim.SetTrigger("OnEnemyDeath");
+            _deathAnim.SetTrigger("OnEnemyDeath");
+            _audioSource.PlayOneShot(_deathSoundClip);
             Destroy(gameObject, 2.8f);
         }
         else if (other.gameObject.CompareTag("Laser"))
         {
-            gameObject.GetComponent<PolygonCollider2D>().isTrigger = false;
+            gameObject.GetComponent<PolygonCollider2D>().enabled = false;
             if (_player != null)
             {
-                _player.AddToScore(_scoreValue); ;
+                _player.AddToScore(_scoreValue);
             }
             _speed = 0;
-            _anim.SetTrigger("OnEnemyDeath");
+            _deathAnim.SetTrigger("OnEnemyDeath");
             Destroy(other.gameObject);
+            _audioSource.PlayOneShot(_deathSoundClip);
             Destroy(gameObject, 2.8f);
         }
-
-        
+                
     }
 }

@@ -20,6 +20,8 @@ public class Player : MonoBehaviour
     private SpawnManager _spawnManager;
     [SerializeField]
     private GameObject _shieldVisualizer;
+    [SerializeField]
+    private GameObject[] _damageVisualizer;
 
     private bool _isTripleShotActive = false;
     private bool _isSpeedActive = false;
@@ -30,13 +32,35 @@ public class Player : MonoBehaviour
 
     private UIManager _uiManager;
 
+    private AudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _laserSoundClip;
+    [SerializeField]
+    private AudioClip _deathSoundClip;
+
     void Start()
     {
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _audioSource = GetComponent<AudioSource>();
+
         if (_spawnManager == null)
         {
             Debug.LogError("Spawn Manager is NULL");
+        }
+
+        if (_uiManager == null)
+        {
+            Debug.LogError("UI Manager is NULL");
+        }
+
+        if (_audioSource == null)
+        {
+            Debug.LogError("Audio Source on Player is NULL.");
+        }
+        else
+        {
+            _audioSource.clip = _laserSoundClip;
         }
 
         transform.position = new Vector3(0, 0, 0);
@@ -91,6 +115,8 @@ public class Player : MonoBehaviour
         {
             Instantiate(_primaryLaserPrefab, transform.position + _primaryLaserOffset, Quaternion.identity);
         }
+
+        _audioSource.Play();
     }
 
     public void Damage()
@@ -107,9 +133,12 @@ public class Player : MonoBehaviour
 
         if (_lives < 1)
         {
-            _spawnManager.OnPlayerDeath();
+            _audioSource.PlayOneShot(_deathSoundClip);
+            _spawnManager.OnPlayerDeath();            
             Destroy(gameObject);
         }
+
+        ShowNewDamage();
     }
 
     public void ActivateTripleShotPowerup()
@@ -146,5 +175,17 @@ public class Player : MonoBehaviour
     {
         _score += points;
         _uiManager.UpdateScore(_score);
+    }
+
+    private void ShowNewDamage()
+    {
+        if (_lives == 2)
+        {
+            _damageVisualizer[0].SetActive(true);
+        }
+        else if (_lives == 1)
+        {
+            _damageVisualizer[1].SetActive(true);
+        }
     }
 }
